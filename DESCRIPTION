@@ -1,11 +1,13 @@
 Package: QuadraticSDK
 Type: Package
-Title: What the Package Does (Title Case)
+Title: A package to call Paul O'Reilly's QUADrATiC Connectivity Map software from R
 Version: 0.1.0
-Author: Who wrote it
-Maintainer: The package maintainer <yourself@somewhere.net>
-Description: More about what it does (maybe more than one line)
-    Use four spaces when indenting paragraphs within the Description.
-License: What license is it under?
+Author: Mr Michael J. Jones
+Maintainer: Mr Michael J. Jones <meicaljohnjones@gmail.com>
+Description: This package is a wrapper around Paul O'Reilly's QUADrATiC Connectivity Map
+    software for R allowing QUADrATiC using RCurl. This package assumes the end user has 
+    already installed and is running an instance of QUADrATiC which can be retrieved from 
+    http://go.qub.ac.uk/QUADrATiC/.
+License: GPL-3
 Encoding: UTF-8
 LazyData: true
