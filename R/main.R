@@ -18,5 +18,15 @@ analyze <- function(up.regulated, down.regulated,
   sig.id <- paste0('sig', abs(ceiling(rnorm(1) * 100)))
   cat(sig.id, '\n')
 
+  # submit query gene sig
   r <- POST(paste0(endpoint, '/api/sigs'), body=list(id=sig.id, probes=as.list(probes)), encode='json')
+
+  # submit job
+  job.id <- paste(sig.id, Sys.time())
+  job.body <- list(id=job.id, sigId=sig.id,
+                   datasetId=analysis.set,
+                   nRands=num.rand.sigs,
+                   notes=' == QUADrATiC run by QUADrATiC SDK for Rlang == ')
+
+  job.response <- POST(paste0(endpoint, '/api/jobs'), body=job.body, encode='json')
 }
