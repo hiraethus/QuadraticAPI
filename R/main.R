@@ -25,7 +25,7 @@ analyze <- function(up.regulated, down.regulated,
   job.body <- list(id=job.id, sigId=sig.id,
                    datasetId=analysis.set,
                    nRands=num.rand.sigs,
-                   notes=' == QUADrATiC run by QUADrATiC SDK for Rlang == ')
+                   notes=' == QUADrATiC run by QUADrATiC API for Rlang == ')
 
   job.response <- httr::POST(paste0(endpoint, '/api/jobs'), body=job.body, encode='json')
   job.id.timestamped <- httr::content(job.response)$id
@@ -45,3 +45,6 @@ analyze <- function(up.regulated, down.regulated,
 
   # TODO retrieve result and save to data.frame
 }
+
+analyze(up.regulated = c('g1', 'g2', 'g3'), down.regulated = 'g4')
+

@@ -1,4 +1,4 @@
-Package: QuadraticSDK
+Package: QuadraticAPI
 Type: Package
 Title: A package to call Paul O'Reilly's QUADrATiC Connectivity Map software from R
 Version: 0.1.0
