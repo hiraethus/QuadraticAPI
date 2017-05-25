@@ -1,4 +1,3 @@
-
 analyze <- function(up.regulated, down.regulated,
                     analysis.set='Drug_Name',
                     num.rand.sigs=2000,
@@ -19,7 +18,7 @@ analyze <- function(up.regulated, down.regulated,
   cat(sig.id, '\n')
 
   # submit query gene sig
-  r <- POST(paste0(endpoint, '/api/sigs'), body=list(id=sig.id, probes=as.list(probes)), encode='json')
+  r <- httr::POST(paste0(endpoint, '/api/sigs'), body=list(id=sig.id, probes=as.list(probes)), encode='json')
 
   # submit job
   job.id <- paste(sig.id, Sys.time())
@@ -28,5 +27,21 @@ analyze <- function(up.regulated, down.regulated,
                    nRands=num.rand.sigs,
                    notes=' == QUADrATiC run by QUADrATiC SDK for Rlang == ')
 
-  job.response <- POST(paste0(endpoint, '/api/jobs'), body=job.body, encode='json')
+  job.response <- httr::POST(paste0(endpoint, '/api/jobs'), body=job.body, encode='json')
+  job.id.timestamped <- httr::content(job.response)$id
+  cat(job.id.timestamped,'\n')
+
+  # poll server to wait for job to finish
+  while (True) {
+    # poll each second
+    Sys.sleep(1)
+    current.jobs <- httr::GET(paste0(endpoint, '/api/jobs/current'))
+
+    is.job.still.going <-
+      Reduce(`||`, sapply(current.jobs, function(job) job$sigId == sig.id && job$state == 'IN_PROGRESS'))
+
+    if (!is.job.still.going) break;
+  }
+
+  # TODO retrieve result and save to data.frame
 }
