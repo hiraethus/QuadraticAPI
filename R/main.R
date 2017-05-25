@@ -21,7 +21,7 @@ analyze <- function(up.regulated, down.regulated,
   r <- httr::POST(paste0(endpoint, '/api/sigs'), body=list(id=sig.id, probes=as.list(probes)), encode='json')
 
   # submit job
-  job.id <- paste(sig.id, Sys.time())
+  job.id <- paste0(sig.id, format(Sys.time(), "%Y-%m-%d-%H-%M-%S"))
   job.body <- list(id=job.id, sigId=sig.id,
                    datasetId=analysis.set,
                    nRands=num.rand.sigs,
@@ -45,6 +45,4 @@ analyze <- function(up.regulated, down.regulated,
 
   # TODO retrieve result and save to data.frame
 }
-
-analyze(up.regulated = c('g1', 'g2', 'g3'), down.regulated = 'g4')
 
