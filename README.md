@@ -1,6 +1,6 @@
 # QuadraticAPI
 
-_Please note, this package is under development and the format of functions used here is not set in stone. Consequently, the way functions are called may break in future build. For any queries, please email me at [meicaljohnjones@gmail.com](mailto:meicaljohnjones@gmail.com)._
+_Please note, this package is under development and the format of functions used here is not set in stone. Consequently, the way functions are called may break in future build. For any queries, please email me at [meicaljohnjones@gmail.com](mailto:meicaljohnjones@gmail.com). Pull requests are welcome!_
 
 The aim of QuadraticAPI is to provide an R wrapper for Paul O'Reilly's [QUADrATiC: scalable gene expression connectivity mapping for repurposing FDA-approved therapeutics](http://pure.qub.ac.uk/portal/en/publications/quadratic-scalable-gene-expression-connectivity-mapping-for-repurposing-fdaapproved-therapeutics(d536c74c-8eee-480e-a23e-656e1570416c).html). QUADrATiC exposes a web service interface which this package interacts with, making it easier to run batches of jobs against the server.
 
