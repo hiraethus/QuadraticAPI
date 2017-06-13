@@ -15,7 +15,6 @@ analyze <- function(up.regulated, down.regulated,
 
   probes <- c(up.regulated.vals, down.regulated.vals)
   sig.id <- paste0('sig', abs(ceiling(rnorm(1) * 100)))
-  cat(sig.id, '\n')
 
   # submit query gene sig
   r <- httr::POST(paste0(endpoint, '/api/sigs'), body=list(id=sig.id, probes=as.list(probes)), encode='json')
@@ -29,7 +28,6 @@ analyze <- function(up.regulated, down.regulated,
 
   job.response <- httr::POST(paste0(endpoint, '/api/jobs'), body=job.body, encode='json')
   job.id.timestamped <- httr::content(job.response)$id
-  cat(job.id.timestamped,'\n')
 
   # poll server to wait for job to finish
   while (TRUE) {
@@ -45,6 +43,25 @@ analyze <- function(up.regulated, down.regulated,
     if (!is.job.still.going) break;
   }
 
-  # TODO retrieve result and save to data.frame
-}
+  # unmarshal result and convert to data.frame
+  result.endpoint <- paste0('/api/results/', job.id.timestamped)
+  result <- httr::content(httr::GET(paste0('http://localhost:8090', result.endpoint)))
 
+  num.results <- length(result$resultList)
+  results.df <- data.frame(id=character(num.results),
+                           connection.strength=numeric(num.results),
+                            connection.score=numeric(num.results),
+                            p.val=numeric(num.results),
+                            num.profiles=numeric(num.results),
+                            stringsAsFactors = FALSE)
+
+  for (i in seq(num.results)) {
+    results.df[i, 'id']                   <-  as.character(result$resultList[[i]][['id']])
+    results.df[i, 'connection.strength']     <-  result$resultList[[i]][['cs']]
+    results.df[i, 'connection.score'] <-  result$resultList[[i]][['rawCs']]
+    results.df[i, 'p.val']                <-  result$resultList[[i]][['pVal']]
+    results.df[i, 'num.profiles']         <-  result$resultList[[i]][['n']]
+  }
+
+  results.df
+}
