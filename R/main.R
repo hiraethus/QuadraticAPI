@@ -32,13 +32,15 @@ analyze <- function(up.regulated, down.regulated,
   cat(job.id.timestamped,'\n')
 
   # poll server to wait for job to finish
-  while (True) {
+  while (TRUE) {
     # poll each second
     Sys.sleep(1)
     current.jobs <- httr::GET(paste0(endpoint, '/api/jobs/current'))
+    current.jobs.content <- httr::content(current.jobs)
 
     is.job.still.going <-
-      Reduce(`||`, sapply(current.jobs, function(job) job$sigId == sig.id && job$state == 'IN_PROGRESS'))
+      Reduce(`||`, sapply(current.jobs.content,
+                          function(job) job$sigId == sig.id && job$state == 'IN_PROGRESS'))
 
     if (!is.job.still.going) break;
   }
