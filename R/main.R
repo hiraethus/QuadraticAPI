@@ -49,7 +49,7 @@ analyze <- function(up.regulated, down.regulated,
 
   num.results <- length(result$resultList)
   results.df <- data.frame(id=character(num.results),
-                           connection.strength=numeric(num.results),
+                           z.score=numeric(num.results),
                             connection.score=numeric(num.results),
                             p.val=numeric(num.results),
                             num.profiles=numeric(num.results),
@@ -57,7 +57,7 @@ analyze <- function(up.regulated, down.regulated,
 
   for (i in seq(num.results)) {
     results.df[i, 'id']                   <-  as.character(result$resultList[[i]][['id']])
-    results.df[i, 'connection.strength']     <-  result$resultList[[i]][['cs']]
+    results.df[i, 'z.score']     <-  result$resultList[[i]][['cs']]
     results.df[i, 'connection.score'] <-  result$resultList[[i]][['rawCs']]
     results.df[i, 'p.val']                <-  result$resultList[[i]][['pVal']]
     results.df[i, 'num.profiles']         <-  result$resultList[[i]][['n']]
