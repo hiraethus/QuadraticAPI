@@ -1,11 +1,11 @@
 Package: QuadraticAPI
 Type: Package
 Title: A package to call Paul O'Reilly's QUADrATiC Connectivity Map software from R
-Version: 0.1.0
+Version: 0.1.1
 Author: Mr Michael J. Jones
 Maintainer: Mr Michael J. Jones <meicaljohnjones@gmail.com>
 Description: This package is a wrapper around Paul O'Reilly's QUADrATiC Connectivity Map
-    software for R allowing QUADrATiC using RCurl. This package assumes the end user has 
+    software for R allowing QUADrATiC using Hadley Wickham's httr package. This package assumes the end user has 
     already installed and is running an instance of QUADrATiC which can be retrieved from 
     http://go.qub.ac.uk/QUADrATiC/.
 License: GPL-3
@@ -14,4 +14,5 @@ LazyData: true
 Depends:
     R (>= 3.4.0)
 Imports:
-    httr (>= 1.2.1)
+    httr  (>= 1.2.1),
+    xml2  (>= 1.1.1)

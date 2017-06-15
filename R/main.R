@@ -1,19 +1,9 @@
-analyze <- function(up.regulated, down.regulated,
+analyze <- function(query.gene.sig,
                     analysis.set='Drug_Name',
                     num.rand.sigs=2000,
                     endpoint=getOption('quadratic.endpoint', default = 'http://127.0.0.1:8090'))
 {
-  # check up.regulated and down.regulated are char vecs
-  stopifnot(is.character(up.regulated))
-  stopifnot(is.character(down.regulated))
-
-  up.regulated.vals <- rep(1, length(up.regulated))
-  names(up.regulated.vals) <- up.regulated
-
-  down.regulated.vals <- rep(-1, length(down.regulated))
-  names(down.regulated.vals) <- down.regulated
-
-  probes <- c(up.regulated.vals, down.regulated.vals)
+  probes <- data.frame.to.qgs(query.gene.sig)
   sig.id <- paste0('sig', abs(ceiling(rnorm(1) * 100)))
 
   # submit query gene sig
@@ -64,4 +54,16 @@ analyze <- function(up.regulated, down.regulated,
   }
 
   results.df
+}
+
+data.frame.to.qgs <- function(qgs.df) {
+  stopifnot(is.data.frame(qgs.df))
+  stopifnot(ncol(qgs.df) == 2)
+  stopifnot(is.character(qgs.df[[1]]))
+  stopifnot(is.integer(qgs.df[[2]]))
+
+  qgs <- qgs.df[[2]]
+  names(qgs) <- qgs.df[[1]]
+
+  return(qgs)
 }
