@@ -32,3 +32,44 @@ result <- analyze(estrogen.sig)
 * *Note:* Probe IDs must be for the Affymetrix GeneChip U133A platform in order to be successful
 * `result` will contain a data.frame and it should look something like this:
 ![Rable of Results](./results-table.PNG "Table of Results")
+
+## Batch Processing Example
+
+To perform a batch of connections using QuadraticAPI, you can do this quite easily using the lapply command:
+
+```R
+files <- list.files(path='data/', pattern='*.tsv', full.names = T)
+perform.quadratic <- function(file.name) {
+  sig.df <- read.table(file.name, stringsAsFactors = F)
+  connections <- analyze(sig.df)
+  
+  result <- list(
+    file.name=file.name,
+    connections=connections
+  )
+}
+
+all.connections <- lapply(files, perform.quadratic)
+```
+
+which will return a list containing lists that have both the filename and connections in them. e.g. to access
+the first result, use the following notation:
+
+```R
+all.connections[[1]]$file.name
+all.connections[[1]]$connections
+```
+
+_Note:_ If you have memory constraints, you may want to save results to separate files rather than collecting them all in memory:
+
+```R
+files <- list.files(path='data/', pattern='*.tsv', full.names = T)
+perform.quadratic <- function(file.name) {
+  sig.df <- read.table(file.name, stringsAsFactors = F)
+  connections <- analyze(sig.df)
+  
+  write.table(connections, file=paste0(file.name, '.connections'))
+}
+
+lapply(files, perform.quadratic)
+```
