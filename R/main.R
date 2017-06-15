@@ -35,7 +35,7 @@ analyze <- function(query.gene.sig,
 
   # unmarshal result and convert to data.frame
   result.endpoint <- paste0('/api/results/', job.id.timestamped)
-  result <- httr::content(httr::GET(paste0('http://localhost:8090', result.endpoint)))
+  result <- httr::content(httr::GET(paste0(endpoint, result.endpoint)))
 
   num.results <- length(result$resultList)
   results.df <- data.frame(id=character(num.results),
