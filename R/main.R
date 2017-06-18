@@ -19,6 +19,8 @@ analyze <- function(query.gene.sig,
   job.response <- httr::POST(paste0(endpoint, '/api/jobs'), body=job.body, encode='json')
   job.id.timestamped <- httr::content(job.response)$id
 
+  progress.bar <- utils::txtProgressBar(1, 100, style=3)
+
   # poll server to wait for job to finish
   while (TRUE) {
     # poll each second
@@ -26,11 +28,10 @@ analyze <- function(query.gene.sig,
     current.jobs <- httr::GET(paste0(endpoint, '/api/jobs/current'))
     current.jobs.content <- httr::content(current.jobs)
 
-    is.job.still.going <-
-      Reduce(`||`, sapply(current.jobs.content,
-                          function(job) job$sigId == sig.id && job$state == 'IN_PROGRESS'))
+    this.job <- Filter(function(job) job$id == job.id.timestamped, current.jobs.content)[[1]]
+    setTxtProgressBar(progress.bar, this.job$percentDone)
 
-    if (!is.job.still.going) break;
+    if (this.job$state != 'IN_PROGRESS') break;
   }
 
   # unmarshal result and convert to data.frame
