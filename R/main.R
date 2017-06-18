@@ -54,6 +54,10 @@ analyze <- function(query.gene.sig,
     results.df[i, 'num.profiles']         <-  result$resultList[[i]][['n']]
   }
 
+  # clean up - delete sig
+  sig.id.endpoint <- paste0('/api/sigs/', sig.id)
+  httr::DELETE(paste0(endpoint, sig.id.endpoint))
+
   results.df
 }
 
