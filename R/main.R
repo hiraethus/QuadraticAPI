@@ -38,7 +38,17 @@ analyze <- function(query.gene.sig,
 
   # unmarshal result and convert to data.frame
   result.endpoint <- paste0('/api/results/', job.id.timestamped)
-  result <- httr::content(httr::GET(paste0(endpoint, result.endpoint)))
+  result.response <- httr::GET(paste0(endpoint, result.endpoint))
+
+  while (result.response$status_code == 500) {
+    # result isn't quite ready yet, let's back off and try again
+    cat('Waiting for result...\n')
+    Sys.sleep(1)
+    result.response <- httr::GET(paste0(endpoint, result.endpoint))
+  }
+
+
+  result <- httr::content(result.response)
 
   num.results <- length(result$resultList)
   results.df <- data.frame(id=character(num.results),
