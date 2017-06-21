@@ -29,7 +29,9 @@ analyze <- function(query.gene.sig,
     current.jobs.content <- httr::content(current.jobs)
 
     this.job <- Filter(function(job) job$id == job.id.timestamped, current.jobs.content)[[1]]
-    setTxtProgressBar(progress.bar, this.job$percentDone)
+    if (is.finite(this.job$percentDone) && this.job$percentDone >= 1 && this.job$percentDone <= 100) {
+      setTxtProgressBar(progress.bar, this.job$percentDone)
+    }
 
     if (this.job$state != 'IN_PROGRESS') break;
   }
