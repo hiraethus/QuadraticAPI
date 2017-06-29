@@ -3,6 +3,8 @@ analyze <- function(query.gene.sig,
                     num.rand.sigs=2000,
                     endpoint=getOption('quadratic.endpoint', default = 'http://127.0.0.1:8090'))
 {
+  .StopIfQuadraticEndpointDown(endpoint)
+
   probes <- data.frame.to.qgs(query.gene.sig)
   sig.id <- paste0('sig', abs(ceiling(rnorm(1) * 100)))
 
@@ -83,4 +85,13 @@ data.frame.to.qgs <- function(qgs.df) {
   names(qgs) <- qgs.df[[1]]
 
   return(qgs)
+}
+
+.StopIfQuadraticEndpointDown <- function(endpoint) {
+  tryCatch({
+    RCurl::httpGET(endpoint)
+  }, error = function(e) {
+    cat('Could not contact QUADrATiC Server')
+    stop(e)
+  })
 }
