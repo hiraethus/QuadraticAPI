@@ -89,7 +89,7 @@ data.frame.to.qgs <- function(qgs.df) {
 
 .StopIfQuadraticEndpointDown <- function(endpoint) {
   tryCatch({
-    RCurl::httpGET(endpoint)
+    httr::GET(endpoint)
   }, error = function(e) {
     cat('Could not contact QUADrATiC Server')
     stop(e)
