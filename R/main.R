@@ -5,14 +5,10 @@ analyze <- function(query.gene.sig,
 {
   .StopIfQuadraticEndpointDown(endpoint)
 
+  sig.id <- .GenerateRandomSigID()
   probes <- .DataFrameToQGS(query.gene.sig)
-  sig.id <- paste0('sig', abs(ceiling(rnorm(1) * 100)))
-
-  # submit query gene sig
-  r <- httr::POST(paste0(endpoint, '/api/sigs'), body=list(id=sig.id, probes=as.list(probes)), encode='json')
-
+  .SubmitQueryGeneSignature(sig.id, probes, endpoint)
   job.id.timestamped <- .SubmitJob(sig.id, analysis.set, num.rand.sigs, endpoint)
-
 
   progress.bar <- utils::txtProgressBar(1, 100, style=3)
 
@@ -78,6 +74,14 @@ analyze <- function(query.gene.sig,
   names(qgs) <- qgs.df[[1]]
 
   return(qgs)
+}
+
+.GenerateRandomSigID <- function() {
+  paste0('sig', abs(ceiling(rnorm(1) * 100)))
+}
+
+.SubmitQueryGeneSignature <- function(sig.id, probes, endpoint) {
+  httr::POST(paste0(endpoint, '/api/sigs'), body=list(id=sig.id, probes=as.list(probes)), encode='json')
 }
 
 .SubmitJob <- function(sig.id, analysis.set, num.rand.sigs, endpoint) {
