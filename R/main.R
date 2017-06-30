@@ -1,23 +1,36 @@
+#' Call QUADrATiC with a query gene signature
+#'
+#' @param query.gene.sig A data frame containing one column of probe IDs and a second with values of 1 where up-regulated and -1 where down-regulated.
+#' @param analysis.set Define how reference profiles are grouped into reference sets in QUADrATiC. Valid values are Drug_Name, Drug_Name+Cell_Line, Drug_Name+Cell_Line+Time, Drug_Name+Conc+Cell_Line and Drug_Name+Conc+Cell_Line+Time. Default is Drug_Name.
+#' @param num.rand.sigs The number of random signatures generated to estimate p-value. Default is 2000.
+#' @param endpoint The URL for QUADrATiC. Default is http://localhost:8090. This can also be set globally by setting the option 'quadratic.endpoint'.
+#'
+#' @export
+#'
+#' @examples
+#' estrogen.signature <- read.table('data/Estrogen.tsv', stringsAsFactors = F)
+#' analyze(estrogen.signature)
+#'
 analyze <- function(query.gene.sig,
                     analysis.set='Drug_Name',
                     num.rand.sigs=2000,
                     endpoint=getOption('quadratic.endpoint', default = 'http://127.0.0.1:8090')) {
 
-  .StopIfQuadraticEndpointDown(endpoint)
+  StopIfQuadraticEndpointDown(endpoint)
 
-  sig.id <- .GenerateRandomSigID()
-  probes <- .DataFrameToQGS(query.gene.sig)
-  .SubmitQueryGeneSignature(sig.id, probes, endpoint)
-  job.id.timestamped <- .SubmitJob(sig.id, analysis.set, num.rand.sigs, endpoint)
+  sig.id <- GenerateRandomSigID()
+  probes <- DataFrameToQGS(query.gene.sig)
+  SubmitQueryGeneSignature(sig.id, probes, endpoint)
+  job.id.timestamped <- SubmitJob(sig.id, analysis.set, num.rand.sigs, endpoint)
 
-  .WaitForJobToFinish(job.id.timestamped, endpoint)
-  .DeleteQueryGeneSignature(sig.id, endpoint)
+  WaitForJobToFinish(job.id.timestamped, endpoint)
+  DeleteQueryGeneSignature(sig.id, endpoint)
 
-  result <- .RetrieveResult(job.id.timestamped, endpoint)
-  .ResultToDataFrame(result)
+  result <- RetrieveResult(job.id.timestamped, endpoint)
+  ResultToDataFrame(result)
 }
 
-.DataFrameToQGS <- function(qgs.df) {
+DataFrameToQGS <- function(qgs.df) {
   stopifnot(is.data.frame(qgs.df))
   stopifnot(ncol(qgs.df) == 2)
   stopifnot(is.character(qgs.df[[1]]))
@@ -29,20 +42,20 @@ analyze <- function(query.gene.sig,
   return(qgs)
 }
 
-.GenerateRandomSigID <- function() {
+GenerateRandomSigID <- function() {
   paste0('sig', abs(ceiling(rnorm(1) * 100)))
 }
 
-.SubmitQueryGeneSignature <- function(sig.id, probes, endpoint) {
+SubmitQueryGeneSignature <- function(sig.id, probes, endpoint) {
   httr::POST(paste0(endpoint, '/api/sigs'), body=list(id=sig.id, probes=as.list(probes)), encode='json')
 }
 
-.DeleteQueryGeneSignature <- function(sig.id, endpoint) {
+DeleteQueryGeneSignature <- function(sig.id, endpoint) {
   sig.id.endpoint <- paste0('/api/sigs/', sig.id)
   httr::DELETE(paste0(endpoint, sig.id.endpoint))
 }
 
-.SubmitJob <- function(sig.id, analysis.set, num.rand.sigs, endpoint) {
+SubmitJob <- function(sig.id, analysis.set, num.rand.sigs, endpoint) {
   job.id <- paste0(sig.id, format(Sys.time(), "%Y-%m-%d-%H-%M-%S"))
   job.body <- list(id=job.id, sigId=sig.id,
                    datasetId=analysis.set,
@@ -53,7 +66,7 @@ analyze <- function(query.gene.sig,
   httr::content(job.response)$id
 }
 
-.WaitForJobToFinish <- function(job.id.timestamped, endpoint) {
+WaitForJobToFinish <- function(job.id.timestamped, endpoint) {
   progress.bar <- txtProgressBar(1, 100, style=3)
 
   # poll server to wait for job to finish
@@ -72,7 +85,7 @@ analyze <- function(query.gene.sig,
   }
 }
 
-.RetrieveResult <- function(job.id.timestamped, endpoint) {
+RetrieveResult <- function(job.id.timestamped, endpoint) {
   result.endpoint <- paste0('/api/results/', job.id.timestamped)
   result.response <- httr::GET(paste0(endpoint, result.endpoint))
 
@@ -86,7 +99,7 @@ analyze <- function(query.gene.sig,
   httr::content(result.response)
 }
 
-.ResultToDataFrame <- function(result) {
+ResultToDataFrame <- function(result) {
   num.results <- length(result$resultList)
   results.df <- data.frame(id=character(num.results),
                            z.score=numeric(num.results),
@@ -106,7 +119,7 @@ analyze <- function(query.gene.sig,
   results.df
 }
 
-.StopIfQuadraticEndpointDown <- function(endpoint) {
+StopIfQuadraticEndpointDown <- function(endpoint) {
   tryCatch({
     httr::GET(endpoint)
   }, error = function(e) {

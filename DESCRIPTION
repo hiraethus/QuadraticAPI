@@ -1,7 +1,7 @@
 Package: QuadraticAPI
 Type: Package
 Title: A package to call Paul O'Reilly's QUADrATiC Connectivity Map software from R
-Version: 0.1.36
+Version: 0.1.37
 Author: Mr Michael J. Jones
 Maintainer: Mr Michael J. Jones <meicaljohnjones@gmail.com>
 Description: This package is a wrapper around Paul O'Reilly's QUADrATiC Connectivity Map
@@ -16,3 +16,4 @@ Depends:
 Imports:
     httr  (>= 1.2.1),
     xml2  (>= 1.1.1)
+RoxygenNote: 6.0.1
