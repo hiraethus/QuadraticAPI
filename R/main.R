@@ -10,22 +10,7 @@ analyze <- function(query.gene.sig,
   .SubmitQueryGeneSignature(sig.id, probes, endpoint)
   job.id.timestamped <- .SubmitJob(sig.id, analysis.set, num.rand.sigs, endpoint)
 
-  progress.bar <- utils::txtProgressBar(1, 100, style=3)
-
-  # poll server to wait for job to finish
-  while (TRUE) {
-    # poll each second
-    Sys.sleep(1)
-    current.jobs <- httr::GET(paste0(endpoint, '/api/jobs/current'))
-    current.jobs.content <- httr::content(current.jobs)
-
-    this.job <- Filter(function(job) job$id == job.id.timestamped, current.jobs.content)[[1]]
-    if (is.finite(this.job$percentDone) && this.job$percentDone >= 1 && this.job$percentDone <= 100) {
-      setTxtProgressBar(progress.bar, this.job$percentDone)
-    }
-
-    if (this.job$state != 'IN_PROGRESS') break;
-  }
+  .WaitForJobToFinish(job.id.timestamped, endpoint)
 
   # unmarshal result and convert to data.frame
   result.endpoint <- paste0('/api/results/', job.id.timestamped)
@@ -37,7 +22,6 @@ analyze <- function(query.gene.sig,
     Sys.sleep(1)
     result.response <- httr::GET(paste0(endpoint, result.endpoint))
   }
-
 
   result <- httr::content(result.response)
 
@@ -93,6 +77,25 @@ analyze <- function(query.gene.sig,
 
   job.response <- httr::POST(paste0(endpoint, '/api/jobs'), body=job.body, encode='json')
   httr::content(job.response)$id
+}
+
+.WaitForJobToFinish <- function(job.id.timestamped, endpoint) {
+  progress.bar <- txtProgressBar(1, 100, style=3)
+
+  # poll server to wait for job to finish
+  while (TRUE) {
+    # poll each second
+    Sys.sleep(1)
+    current.jobs <- httr::GET(paste0(endpoint, '/api/jobs/current'))
+    current.jobs.content <- httr::content(current.jobs)
+
+    this.job <- Filter(function(job) job$id == job.id.timestamped, current.jobs.content)[[1]]
+    if (is.finite(this.job$percentDone) && this.job$percentDone >= 1 && this.job$percentDone <= 100) {
+      setTxtProgressBar(progress.bar, this.job$percentDone)
+    }
+
+    if (this.job$state != 'IN_PROGRESS') break;
+  }
 }
 
 .StopIfQuadraticEndpointDown <- function(endpoint) {
