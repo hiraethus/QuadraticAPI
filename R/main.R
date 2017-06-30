@@ -11,15 +11,8 @@ analyze <- function(query.gene.sig,
   # submit query gene sig
   r <- httr::POST(paste0(endpoint, '/api/sigs'), body=list(id=sig.id, probes=as.list(probes)), encode='json')
 
-  # submit job
-  job.id <- paste0(sig.id, format(Sys.time(), "%Y-%m-%d-%H-%M-%S"))
-  job.body <- list(id=job.id, sigId=sig.id,
-                   datasetId=analysis.set,
-                   nRands=num.rand.sigs,
-                   notes=' == QUADrATiC run by QUADrATiC API for Rlang == ')
+  job.id.timestamped <- .SubmitJob(sig.id, analysis.set, num.rand.sigs, endpoint)
 
-  job.response <- httr::POST(paste0(endpoint, '/api/jobs'), body=job.body, encode='json')
-  job.id.timestamped <- httr::content(job.response)$id
 
   progress.bar <- utils::txtProgressBar(1, 100, style=3)
 
@@ -85,6 +78,17 @@ analyze <- function(query.gene.sig,
   names(qgs) <- qgs.df[[1]]
 
   return(qgs)
+}
+
+.SubmitJob <- function(sig.id, analysis.set, num.rand.sigs, endpoint) {
+  job.id <- paste0(sig.id, format(Sys.time(), "%Y-%m-%d-%H-%M-%S"))
+  job.body <- list(id=job.id, sigId=sig.id,
+                   datasetId=analysis.set,
+                   nRands=num.rand.sigs,
+                   notes=' == QUADrATiC run by QUADrATiC API for Rlang == ')
+
+  job.response <- httr::POST(paste0(endpoint, '/api/jobs'), body=job.body, encode='json')
+  httr::content(job.response)$id
 }
 
 .StopIfQuadraticEndpointDown <- function(endpoint) {
