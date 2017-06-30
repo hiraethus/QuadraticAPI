@@ -5,7 +5,7 @@ analyze <- function(query.gene.sig,
 {
   .StopIfQuadraticEndpointDown(endpoint)
 
-  probes <- data.frame.to.qgs(query.gene.sig)
+  probes <- .DataFrameToQGS(query.gene.sig)
   sig.id <- paste0('sig', abs(ceiling(rnorm(1) * 100)))
 
   # submit query gene sig
@@ -75,7 +75,7 @@ analyze <- function(query.gene.sig,
   results.df
 }
 
-data.frame.to.qgs <- function(qgs.df) {
+.DataFrameToQGS <- function(qgs.df) {
   stopifnot(is.data.frame(qgs.df))
   stopifnot(ncol(qgs.df) == 2)
   stopifnot(is.character(qgs.df[[1]]))
