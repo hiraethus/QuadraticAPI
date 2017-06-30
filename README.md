@@ -73,3 +73,6 @@ perform.quadratic <- function(file.name) {
 
 lapply(files, perform.quadratic)
 ```
+
+### References
+O’Reilly, Paul G., Qing Wen, Peter Bankhead, Philip D. Dunne, Darragh G. McArt, Suzanne McPherson, Peter W. Hamilton, Ken I. Mills, and Shu-Dong Zhang. "QUADrATiC: scalable gene expression connectivity mapping for repurposing FDA-approved therapeutics." BMC bioinformatics 17, no. 1 (2016): 198.
