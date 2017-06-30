@@ -12,18 +12,7 @@ analyze <- function(query.gene.sig,
 
   .WaitForJobToFinish(job.id.timestamped, endpoint)
 
-  # unmarshal result and convert to data.frame
-  result.endpoint <- paste0('/api/results/', job.id.timestamped)
-  result.response <- httr::GET(paste0(endpoint, result.endpoint))
-
-  while (result.response$status_code == 500) {
-    # result isn't quite ready yet, let's back off and try again
-    cat('Waiting for result...\n')
-    Sys.sleep(1)
-    result.response <- httr::GET(paste0(endpoint, result.endpoint))
-  }
-
-  result <- httr::content(result.response)
+  result <- .RetrieveResult(job.id.timestamped, endpoint)
 
   num.results <- length(result$resultList)
   results.df <- data.frame(id=character(num.results),
@@ -96,6 +85,20 @@ analyze <- function(query.gene.sig,
 
     if (this.job$state != 'IN_PROGRESS') break;
   }
+}
+
+.RetrieveResult <- function(job.id.timestamped, endpoint) {
+  result.endpoint <- paste0('/api/results/', job.id.timestamped)
+  result.response <- httr::GET(paste0(endpoint, result.endpoint))
+
+  while (result.response$status_code == 500) {
+    # result isn't quite ready yet, let's back off and try again
+    cat('Waiting for result...\n')
+    Sys.sleep(1)
+    result.response <- httr::GET(paste0(endpoint, result.endpoint))
+  }
+
+  httr::content(result.response)
 }
 
 .StopIfQuadraticEndpointDown <- function(endpoint) {
